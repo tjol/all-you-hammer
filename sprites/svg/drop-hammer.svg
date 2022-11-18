@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="86.604767mm"
+   height="37.979198mm"
+   viewBox="0 0 86.604767 37.979198"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="drop-hammer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.2938725"
+     inkscape:cx="190.8998"
+     inkscape:cy="167.71359"
+     inkscape:window-width="2560"
+     inkscape:window-height="1371"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient973">
+      <stop
+         style="stop-color:#aa4400;stop-opacity:1;"
+         offset="0"
+         id="stop969" />
+      <stop
+         style="stop-color:#943a00;stop-opacity:1;"
+         offset="1"
+         id="stop971" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient973"
+       id="linearGradient975"
+       x1="108.34271"
+       y1="57.947613"
+       x2="108.34271"
+       y2="64.429367"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.8071564,0,0,1.0036098,3.8716139,-0.21769213)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-19.989204,-40.217241)">
+    <rect
+       style="fill:url(#linearGradient975);fill-opacity:1;stroke:#000000;stroke-width:0.3;stroke-dasharray:none"
+       id="rect111"
+       width="78.738976"
+       height="8.3373737"
+       x="20.139204"
+       y="56.136543" />
+    <path
+       style="fill:#1a1a1a;stroke:#000000;stroke-width:0.3;stroke-dasharray:none"
+       d="M 97.444435,50.200521 V 78.04644 h 8.999535 V 50.200521 l -4.49977,-9.628978 z"
+       id="path1139"
+       sodipodi:nodetypes="cccccc" />
+  </g>
+</svg>
