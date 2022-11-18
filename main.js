@@ -5,17 +5,17 @@ import dropHammerImg from './sprites/png/drop-hammer.png'
 import dropHammerShape from './sprites/drop-hammer.shape.json'
 import Phaser from 'phaser'
 
-const orig_nail_circ_pos = [24.576712, 21.896908]
-const orig_nail_circ_radius = 1.0 // 1.7096132
-const nail_width = 150
-const nail_scale = nail_width / 48.761269
-const nail_circ_pos = orig_nail_circ_pos.map(x => x * nail_scale)
-const nail_circ_radius = orig_nail_circ_radius * nail_scale
+const origNailCircPos = [24.576712, 21.896908]
+const origNailCircRadius = 1.0 // 1.7096132
+const nailWidth = 150
+const nailScale = nailWidth / 48.761269
+const nailCircPos = origNailCircPos.map(x => x * nailScale)
+const nailCircRadius = origNailCircRadius * nailScale
 
 const sceneConfig = {
-  preload: preload,
-  create: create,
-  update: update
+  preload,
+  create,
+  update
 }
 
 const config = {
@@ -32,8 +32,6 @@ const config = {
     // }
   }
 }
-
-const game = new Phaser.Game(config)
 
 function preload () {
   this.load.spritesheet('nails', nailSprites, {
@@ -53,9 +51,9 @@ function create () {
     isStatic: true,
     shape: {
       type: 'circle',
-      x: nail_circ_pos[0],
-      y: nail_circ_pos[1],
-      radius: nail_circ_radius
+      x: nailCircPos[0],
+      y: nailCircPos[1],
+      radius: nailCircRadius
     }
   }).scale = 0.5
 
@@ -63,13 +61,13 @@ function create () {
     isStatic: true,
     shape: {
       type: 'circle',
-      x: nail_circ_pos[0],
-      y: nail_circ_pos[1],
-      radius: nail_circ_radius
+      x: nailCircPos[0],
+      y: nailCircPos[1],
+      radius: nailCircRadius
     }
   }).scale = 0.5
 
-  let nailHead0 = this.add.image(300, 200, 'nail-head')
+  const nailHead0 = this.add.image(300, 200, 'nail-head')
   nailHead0.scale = 0.5
   nailHead0.setDepth(-1)
 
@@ -77,9 +75,9 @@ function create () {
     isStatic: true,
     shape: {
       type: 'circle',
-      x: nail_circ_pos[0],
-      y: nail_circ_pos[1],
-      radius: nail_circ_radius
+      x: nailCircPos[0],
+      y: nailCircPos[1],
+      radius: nailCircRadius
     }
   }).scale = 0.5
 
@@ -87,36 +85,19 @@ function create () {
     isStatic: true,
     shape: {
       type: 'circle',
-      x: nail_circ_pos[0],
-      y: nail_circ_pos[1],
-      radius: nail_circ_radius
+      x: nailCircPos[0],
+      y: nailCircPos[1],
+      radius: nailCircRadius
     }
   }).scale = 0.5
 
-  let drop_hammer = this.matter.add.image(400, 100, 'drop-hammer', null, {
+  const dropHammer = this.matter.add.image(400, 100, 'drop-hammer', null, {
     shape: dropHammerShape
   })
-  drop_hammer.setDepth(-1)
+  dropHammer.setDepth(-1)
 }
 
 function update () {}
 
-// document.querySelector('#app').innerHTML = `
-//   <div>
-//     <a href="https://vitejs.dev" target="_blank">
-//       <img src="/vite.svg" class="logo" alt="Vite logo" />
-//     </a>
-//     <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-//       <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-//     </a>
-//     <h1>Hello Vite!</h1>
-//     <div class="card">
-//       <button id="counter" type="button"></button>
-//     </div>
-//     <p class="read-the-docs">
-//       Click on the Vite logo to learn more
-//     </p>
-//   </div>
-// `
-
-// setupCounter(document.querySelector('#counter'))
+// eslint-disable-next-line
+const game = new Phaser.Game(config)
