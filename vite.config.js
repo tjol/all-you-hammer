@@ -3,6 +3,7 @@ export default {
     assetsInlineLimit: 0
   },
   define: {
-    GAME_VERSION: JSON.stringify(process.env.npm_package_version)
-  }
+    __GAME_VERSION__: JSON.stringify(process.env.npm_package_version)
+  },
+  base: ''
 }

@@ -331,6 +331,6 @@ const config = {
 const game = new Phaser.Game(config)
 
 window.addEventListener('load', () => {
-  console.log(`Loading version ${window.GAME_VERSION}`)
-  document.getElementById('version-nr').innerText = window.GAME_VERSION
+  console.log(`Loading version ${__GAME_VERSION__}`)
+  document.getElementById('version-nr').innerText = __GAME_VERSION__
 })
