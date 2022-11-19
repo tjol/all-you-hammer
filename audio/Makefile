@@ -12,7 +12,7 @@ all: $(MP3_TARGETS) $(OGG_TARGETS)
 
 
 %.mp3: %.wav
-	$(FFMPEG) -y -i $< -f ogg $@
+	$(FFMPEG) -y -i $< -f mp3 $@
 
 
 clean:
