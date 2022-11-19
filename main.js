@@ -15,6 +15,8 @@ import nail3SoundOgg from './audio/nail3.ogg'
 import screwSoundMp3 from './audio/screw.mp3'
 import screwSoundOgg from './audio/screw.ogg'
 
+import './style.css'
+
 import Phaser from 'phaser'
 import seedrandom from 'seedrandom'
 
@@ -327,3 +329,8 @@ const config = {
 
 // eslint-disable-next-line
 const game = new Phaser.Game(config)
+
+window.addEventListener('load', () => {
+  console.log(`Loading version ${window.GAME_VERSION}`)
+  document.getElementById('version-nr').innerText = window.GAME_VERSION
+})

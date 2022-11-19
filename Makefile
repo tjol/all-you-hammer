@@ -1,4 +1,5 @@
 NPM?=pnpm
+INKSCAPE?=inkscape
 
 all: dist
 
@@ -11,7 +12,10 @@ sprites:
 npm-install:
 	$(NPM) install
 
-deps: audio sprites npm-install
+logo2x.png: logo.svg
+	$(INKSCAPE) -w 1400 --export-filename $@ "$<"
+
+deps: audio sprites logo2x.png npm-install
 
 dist: deps
 	$(NPM) run build
