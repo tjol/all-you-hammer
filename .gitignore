@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 
 /sprites/png/**/*.png
-/logo2x.png
 /all-you-hammer-banner.png
