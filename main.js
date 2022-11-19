@@ -4,6 +4,7 @@ import nailHeadImg from './sprites/png/nail-head.png'
 import dropHammerImg from './sprites/png/drop-hammer.png'
 import dropHammerShape from './sprites/drop-hammer.shape.json'
 import Phaser from 'phaser'
+import seedrandom from 'seedrandom'
 
 const origNailCircPos = [24.576712, 21.896908]
 const origNailCircRadius = 1.0 // 1.7096132
@@ -12,10 +13,212 @@ const nailScale = nailWidth / 48.761269
 const nailCircPos = origNailCircPos.map(x => x * nailScale)
 const nailCircRadius = origNailCircRadius * nailScale
 
-const sceneConfig = {
-  preload,
-  create,
-  update
+const nailDist = 150
+const positionVariance = 70
+const nailProbabilities = {
+  missing: 0.3,
+  nail: 0.5,
+  secretScrew: 0.15,
+  inWall: 0.05
+}
+
+const hammerTargetPos = 400
+const hudPos = [10, 10]
+
+class AllYouHaveIsAHammer extends Phaser.Scene {
+  constructor () {
+    super()
+    this._yPos = 0
+    this._nails = {}
+    this._seed = 'siehst du die schraube vor lauter hämmern nicht?'
+  }
+
+  preload () {
+    this.load.spritesheet('nails', nailSprites, {
+      frameWidth: 150,
+      frameHeight: 178
+    })
+    this.load.spritesheet('screws', screwSprites, {
+      frameWidth: 150,
+      frameHeight: 178
+    })
+    this.load.image('drop-hammer', dropHammerImg)
+    this.load.image('nail-head', nailHeadImg)
+    this._width = this.sys.game.canvas.width
+    this._height = this.sys.game.canvas.height
+  }
+
+  create () {
+    this._hud = this.add.text(...hudPos, '', {
+      font: 'bold 32px Courier',
+      fill: '#c90'
+    })
+    this._hud.setDepth(100)
+
+    // create the outer walls
+    this.matter.add.rectangle(-5, 100000, 10, 200000, { isStatic: true })
+    this.matter.add.rectangle(this._width + 5, 100000, 10, 200000, {
+      isStatic: true
+    })
+
+    // create the nails
+    this.createNails()
+
+    // create the falling hammer
+    this._dropHammer = this.matter.add.image(
+      this._width / 2,
+      100,
+      'drop-hammer',
+      null,
+      {
+        shape: dropHammerShape
+      }
+    )
+    this._dropHammer.setDepth(0)
+
+    // allow nails to be clicked
+    this.input.on('gameobjectup', (_pointer, gameObject) => {
+      gameObject.emit('clicked', gameObject)
+    })
+  }
+
+  update () {
+    const yPos = this._dropHammer.y - hammerTargetPos
+    if (yPos > this._yPos) {
+      this._yPos = yPos
+      this.cameras.main.scrollY = yPos
+      this.collectGarbage()
+      this.createNails()
+    }
+
+    this._hud.y = this._yPos + hudPos[1]
+    this._hud.setText(`${Math.round(this._dropHammer.y)}`)
+  }
+
+  createNails () {
+    let y0 = Math.max(this._yPos, 300)
+    const yEnd = this._height + this._yPos
+    // place nails at odd multiples of nailDist/2
+    y0 = Math.ceil(y0 / nailDist / 2) * nailDist * 2
+    const x0 = nailDist / 2
+    const xEnd = this._width - nailDist / 2
+
+    for (let y = y0; y < yEnd; y += nailDist) {
+      for (let x = x0; x < xEnd; x += nailDist) {
+        this.createNail(x, y)
+      }
+    }
+  }
+
+  createNail (x, y) {
+    if ([x, y] in this._nails) {
+      return
+    }
+
+    const rng = seedrandom(`${this._seed} @ ${x}, ${y}`)
+
+    const dx = positionVariance * rng()
+    const dy = positionVariance * rng()
+
+    const typeDecisiion = rng()
+    let nailKind
+    let cumProb = 0
+    for (const kind in nailProbabilities) {
+      cumProb += nailProbabilities[kind]
+      if (typeDecisiion <= cumProb) {
+        nailKind = kind
+        break
+      }
+    }
+
+    const orientation = Math.ceil(12 * rng())
+
+    this._nails[[x, y]] = this.manifestNail(
+      [x, y].toString(),
+      x + dx,
+      y + dy,
+      nailKind,
+      orientation
+    )
+  }
+
+  manifestNail (key, x, y, kind, orientation) {
+    const nail = { key, x, y, kind, orientation }
+
+    if (kind === 'nail' || kind === 'secretScrew') {
+      const body = this.matter.add.sprite(x, y, 'nails', orientation, {
+        isStatic: true,
+        shape: {
+          type: 'circle',
+          x: nailCircPos[0],
+          y: nailCircPos[1],
+          radius: nailCircRadius
+        }
+      })
+      body.scale = 0.5
+      body.setDepth(1)
+      body.setInteractive()
+      body.on('clicked', () => this.onNailClicked(key))
+      nail.body = body
+    } else if (kind === 'screw') {
+      const body = this.matter.add.sprite(x, y, 'screws', orientation, {
+        isStatic: true,
+        shape: {
+          type: 'circle',
+          x: nailCircPos[0],
+          y: nailCircPos[1],
+          radius: nailCircRadius
+        }
+      })
+      body.scale = 0.5
+      body.setDepth(1)
+      nail.body = body
+    } else if (kind === 'inWall') {
+      const body = this.add.image(x, y, 'nail-head')
+      body.scale = 0.5
+      body.setDepth(-1)
+      nail.body = body
+    }
+
+    return nail
+  }
+
+  replaceNail (key, newKind) {
+    const nail = this._nails[key]
+    const { x, y, orientation, body } = nail
+    if (body !== undefined) {
+      body.destroy()
+    }
+    this._nails[key] = this.manifestNail(key, x, y, newKind, orientation)
+  }
+
+  onNailClicked (key) {
+    const nail = this._nails[key]
+    if (nail.kind === 'nail') {
+      this.replaceNail(key, 'inWall')
+    } else if (nail.kind === 'secretScrew') {
+      this.replaceNail(key, 'screw')
+    }
+  }
+
+  collectGarbage () {
+    const toReap = []
+
+    for (const key in this._nails) {
+      const y = key.split(',')[1]
+      if (y < this._yPos - nailDist) {
+        toReap.push(key)
+      }
+    }
+
+    for (const key of toReap) {
+      const body = this._nails[key].body
+      if (body !== undefined) {
+        body.destroy()
+      }
+      delete this._nails[key]
+    }
+  }
 }
 
 const config = {
@@ -23,81 +226,16 @@ const config = {
   type: Phaser.AUTO,
   width: 1000,
   height: 1000,
-  scene: sceneConfig,
+  scene: [AllYouHaveIsAHammer],
   backgroundColor: '#eeccaa',
   physics: {
     default: 'matter'
     // matter: {
-    //     debug: true
+    // gravity: false
+    // debug: true
     // }
   }
 }
-
-function preload () {
-  this.load.spritesheet('nails', nailSprites, {
-    frameWidth: 150,
-    frameHeight: 178
-  })
-  this.load.spritesheet('screws', screwSprites, {
-    frameWidth: 150,
-    frameHeight: 178
-  })
-  this.load.image('drop-hammer', dropHammerImg)
-  this.load.image('nail-head', nailHeadImg)
-}
-
-function create () {
-  this.matter.add.sprite(100, 300, 'nails', 5, {
-    isStatic: true,
-    shape: {
-      type: 'circle',
-      x: nailCircPos[0],
-      y: nailCircPos[1],
-      radius: nailCircRadius
-    }
-  }).scale = 0.5
-
-  this.matter.add.sprite(200, 300, 'nails', 2, {
-    isStatic: true,
-    shape: {
-      type: 'circle',
-      x: nailCircPos[0],
-      y: nailCircPos[1],
-      radius: nailCircRadius
-    }
-  }).scale = 0.5
-
-  const nailHead0 = this.add.image(300, 200, 'nail-head')
-  nailHead0.scale = 0.5
-  nailHead0.setDepth(-1)
-
-  this.matter.add.sprite(400, 300, 'nails', 9, {
-    isStatic: true,
-    shape: {
-      type: 'circle',
-      x: nailCircPos[0],
-      y: nailCircPos[1],
-      radius: nailCircRadius
-    }
-  }).scale = 0.5
-
-  this.matter.add.sprite(600, 250, 'nails', 7, {
-    isStatic: true,
-    shape: {
-      type: 'circle',
-      x: nailCircPos[0],
-      y: nailCircPos[1],
-      radius: nailCircRadius
-    }
-  }).scale = 0.5
-
-  const dropHammer = this.matter.add.image(400, 100, 'drop-hammer', null, {
-    shape: dropHammerShape
-  })
-  dropHammer.setDepth(-1)
-}
-
-function update () {}
 
 // eslint-disable-next-line
 const game = new Phaser.Game(config)
