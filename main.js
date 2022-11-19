@@ -3,6 +3,8 @@ import screwSprites from './sprites/png/screws.png'
 import nailHeadImg from './sprites/png/nail-head.png'
 import dropHammerImg from './sprites/png/drop-hammer.png'
 import dropHammerShape from './sprites/drop-hammer.shape.json'
+import restartBtnImg from './sprites/png/restart-btn.png'
+import tiltBtnImg from './sprites/png/tilt-btn.png'
 
 import nail1SoundMp3 from './audio/nail1.mp3'
 import nail1SoundOgg from './audio/nail1.ogg'
@@ -34,15 +36,9 @@ const nailProbabilities = {
 
 const hammerTargetPos = 400
 const hudPos = [10, 10]
+const redAlertPos = [500, 300]
 
 class AllYouHaveIsAHammer extends Phaser.Scene {
-  constructor () {
-    super()
-    this._yPos = 0
-    this._nails = {}
-    this._seed = 'siehst du die schraube vor lauter hämmern nicht?'
-  }
-
   preload () {
     this.load.spritesheet('nails', nailSprites, {
       frameWidth: 150,
@@ -54,12 +50,18 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     })
     this.load.image('drop-hammer', dropHammerImg)
     this.load.image('nail-head', nailHeadImg)
+    this.load.image('restart-btn', restartBtnImg)
+    this.load.image('tilt-btn', tiltBtnImg)
 
     this.load.audio('nail1', [nail1SoundOgg, nail1SoundMp3])
     this.load.audio('nail2', [nail2SoundOgg, nail2SoundMp3])
     this.load.audio('nail3', [nail3SoundOgg, nail3SoundMp3])
     this.load.audio('screw', [screwSoundOgg, screwSoundMp3])
 
+    this._yPos = 0
+    this._tiltCount = 0
+    this._nails = {}
+    this._seed = 'siehst du die schraube vor lauter hämmern nicht?'
     this._width = this.sys.game.canvas.width
     this._height = this.sys.game.canvas.height
   }
@@ -71,6 +73,13 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     })
     this._hud.setDepth(100)
 
+    this._redAlert = this.add.text(...redAlertPos, 'SCREWED', {
+      font: 'bold 96px sans-serif',
+      fill: '#a00'
+    })
+    this._redAlert.setDepth(100)
+    this._redAlert.setVisible(false)
+
     // create the outer walls
     this.matter.add.rectangle(-5, 100000, 10, 200000, { isStatic: true })
     this.matter.add.rectangle(this._width + 5, 100000, 10, 200000, {
@@ -78,7 +87,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     })
 
     // create the nails
-    this.createNails()
+    this._createNails()
 
     // create the falling hammer
     this._dropHammer = this.matter.add.image(
@@ -104,6 +113,29 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       this.sound.add('nail3')
     ]
     this._screwSound = this.sound.add('screw')
+
+    // Create the buttons
+    this._restartBtn = this.add.image(90, this._height - 50, 'restart-btn')
+    this._restartBtn.scale = 0.5
+    this._restartBtn.setDepth(100)
+    this._restartBtn.setInteractive()
+    this._restartBtn.on('clicked', this._restart, this)
+    this._tiltBtn = this.add.image(
+      this._width - 90,
+      this._height - 50,
+      'tilt-btn'
+    )
+    this._tiltBtn.scale = 0.5
+    this._tiltBtn.setDepth(100)
+    this._tiltBtn.setInteractive()
+    this._tiltBtn.on('clicked', this._tilt, this)
+
+    this._fixedObjects = [
+      [this._hud, this._hud.y],
+      [this._redAlert, this._redAlert.y],
+      [this._restartBtn, this._restartBtn.y],
+      [this._tiltBtn, this._tiltBtn.y]
+    ]
   }
 
   update () {
@@ -111,15 +143,22 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     if (yPos > this._yPos) {
       this._yPos = yPos
       this.cameras.main.scrollY = yPos
-      this.collectGarbage()
-      this.createNails()
+      this._collectGarbage()
+      this._createNails()
     }
 
-    this._hud.y = this._yPos + hudPos[1]
-    this._hud.setText(`${Math.round(this._dropHammer.y)}`)
+    for (const [obj, fixedY] of this._fixedObjects) {
+      obj.y = this._yPos + fixedY
+    }
+
+    let hudText = `${Math.round(this._dropHammer.y / nailDist * 10)}`
+    if (this._tiltCount !== 0) {
+      hudText += ` - ${this._tiltCount} TILT`
+    }
+    this._hud.setText(hudText)
   }
 
-  createNails () {
+  _createNails () {
     let y0 = Math.max(this._yPos, 300)
     const yEnd = this._height + this._yPos
     // place nails at odd multiples of nailDist/2
@@ -129,12 +168,12 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
 
     for (let y = y0; y < yEnd; y += nailDist) {
       for (let x = x0; x < xEnd; x += nailDist) {
-        this.createNail(x, y)
+        this._createNail(x, y)
       }
     }
   }
 
-  createNail (x, y) {
+  _createNail (x, y) {
     if ([x, y] in this._nails) {
       return
     }
@@ -157,7 +196,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
 
     const orientation = Math.ceil(12 * rng())
 
-    this._nails[[x, y]] = this.manifestNail(
+    this._nails[[x, y]] = this._manifestNail(
       [x, y].toString(),
       x + dx,
       y + dy,
@@ -166,7 +205,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     )
   }
 
-  manifestNail (key, x, y, kind, orientation) {
+  _manifestNail (key, x, y, kind, orientation) {
     const nail = { key, x, y, kind, orientation }
 
     if (kind === 'nail' || kind === 'secretScrew') {
@@ -182,7 +221,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       body.scale = 0.5
       body.setDepth(1)
       body.setInteractive()
-      body.on('clicked', () => this.onNailClicked(key))
+      body.on('clicked', () => this._onNailClicked(key))
       nail.body = body
     } else if (kind === 'screw') {
       const body = this.matter.add.sprite(x, y, 'screws', orientation, {
@@ -197,7 +236,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       body.scale = 0.5
       body.setDepth(1)
       body.setInteractive()
-      body.on('clicked', () => this.onNailClicked(key))
+      body.on('clicked', () => this._onNailClicked(key))
       nail.body = body
     } else if (kind === 'inWall') {
       const body = this.add.image(x, y, 'nail-head')
@@ -209,38 +248,42 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     return nail
   }
 
-  replaceNail (key, newKind) {
+  _replaceNail (key, newKind) {
     const nail = this._nails[key]
     const { x, y, orientation, body } = nail
     if (body !== undefined) {
       body.destroy()
     }
-    this._nails[key] = this.manifestNail(key, x, y, newKind, orientation)
+    this._nails[key] = this._manifestNail(key, x, y, newKind, orientation)
   }
 
-  onNailClicked (key) {
+  _onNailClicked (key) {
     const nail = this._nails[key]
     if (nail.kind === 'nail') {
-      window.setTimeout(() => this.replaceNail(key, 'inWall'), 150)
-      this.playNailSound()
+      window.setTimeout(() => this._replaceNail(key, 'inWall'), 150)
+      this._playNailSound()
     } else if (nail.kind === 'secretScrew') {
-      window.setTimeout(() => this.replaceNail(key, 'screw'), 150)
-      this.playScrewSound()
+      window.setTimeout(() => {
+        this._replaceNail(key, 'screw')
+        this._redAlert.setVisible(true)
+        window.setTimeout(() => this._redAlert.setVisible(false), 500)
+      }, 150)
+      this._playScrewSound()
     } else if (nail.kind === 'screw') {
-      this.playScrewSound()
+      this._playScrewSound()
     }
   }
 
-  playNailSound () {
+  _playNailSound () {
     const choice = Math.floor(Math.random() * 3)
     this._nailSounds[choice].play()
   }
 
-  playScrewSound () {
+  _playScrewSound () {
     this._screwSound.play()
   }
 
-  collectGarbage () {
+  _collectGarbage () {
     const toReap = []
 
     for (const key in this._nails) {
@@ -258,21 +301,27 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       delete this._nails[key]
     }
   }
+
+  _restart () {
+    this.scene.restart()
+  }
+
+  _tilt () {
+    this._dropHammer.x += (Math.random() - 0.5) * nailDist
+    this._dropHammer.y += (Math.random() - 0.5) * nailDist
+    this._tiltCount += 1
+  }
 }
 
 const config = {
   parent: 'app',
   type: Phaser.AUTO,
-  width: 1000,
-  height: 1000,
+  width: 1024,
+  height: 768,
   scene: [AllYouHaveIsAHammer],
   backgroundColor: '#eeccaa',
   physics: {
     default: 'matter'
-    // matter: {
-    // gravity: false
-    // debug: true
-    // }
   }
 }
 
