@@ -3,6 +3,16 @@ import screwSprites from './sprites/png/screws.png'
 import nailHeadImg from './sprites/png/nail-head.png'
 import dropHammerImg from './sprites/png/drop-hammer.png'
 import dropHammerShape from './sprites/drop-hammer.shape.json'
+
+import nail1SoundMp3 from './audio/nail1.mp3'
+import nail1SoundOgg from './audio/nail1.ogg'
+import nail2SoundMp3 from './audio/nail2.mp3'
+import nail2SoundOgg from './audio/nail2.ogg'
+import nail3SoundMp3 from './audio/nail3.mp3'
+import nail3SoundOgg from './audio/nail3.ogg'
+import screwSoundMp3 from './audio/screw.mp3'
+import screwSoundOgg from './audio/screw.ogg'
+
 import Phaser from 'phaser'
 import seedrandom from 'seedrandom'
 
@@ -44,6 +54,12 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     })
     this.load.image('drop-hammer', dropHammerImg)
     this.load.image('nail-head', nailHeadImg)
+
+    this.load.audio('nail1', [nail1SoundOgg, nail1SoundMp3])
+    this.load.audio('nail2', [nail2SoundOgg, nail2SoundMp3])
+    this.load.audio('nail3', [nail3SoundOgg, nail3SoundMp3])
+    this.load.audio('screw', [screwSoundOgg, screwSoundMp3])
+
     this._width = this.sys.game.canvas.width
     this._height = this.sys.game.canvas.height
   }
@@ -80,6 +96,14 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this.input.on('gameobjectup', (_pointer, gameObject) => {
       gameObject.emit('clicked', gameObject)
     })
+
+    // Prepare the audio files
+    this._nailSounds = [
+      this.sound.add('nail1'),
+      this.sound.add('nail2'),
+      this.sound.add('nail3')
+    ]
+    this._screwSound = this.sound.add('screw')
   }
 
   update () {
@@ -172,6 +196,8 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       })
       body.scale = 0.5
       body.setDepth(1)
+      body.setInteractive()
+      body.on('clicked', () => this.onNailClicked(key))
       nail.body = body
     } else if (kind === 'inWall') {
       const body = this.add.image(x, y, 'nail-head')
@@ -195,10 +221,23 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
   onNailClicked (key) {
     const nail = this._nails[key]
     if (nail.kind === 'nail') {
-      this.replaceNail(key, 'inWall')
+      window.setTimeout(() => this.replaceNail(key, 'inWall'), 150)
+      this.playNailSound()
     } else if (nail.kind === 'secretScrew') {
-      this.replaceNail(key, 'screw')
+      window.setTimeout(() => this.replaceNail(key, 'screw'), 150)
+      this.playScrewSound()
+    } else if (nail.kind === 'screw') {
+      this.playScrewSound()
     }
+  }
+
+  playNailSound () {
+    const choice = Math.floor(Math.random() * 3)
+    this._nailSounds[choice].play()
+  }
+
+  playScrewSound () {
+    this._screwSound.play()
   }
 
   collectGarbage () {
