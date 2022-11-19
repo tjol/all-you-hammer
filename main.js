@@ -61,7 +61,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this._yPos = 0
     this._tiltCount = 0
     this._nails = {}
-    this._seed = 'siehst du die schraube vor lauter hämmern nicht?'
+    this._seed = 'all you have is two hammers, one visible and one invisible'
     this._width = this.sys.game.canvas.width
     this._height = this.sys.game.canvas.height
   }
@@ -160,7 +160,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
 
   _createNails () {
     let y0 = Math.max(this._yPos, 300)
-    const yEnd = this._height + this._yPos
+    const yEnd = this._height + this._yPos + 2 * nailDist
     // place nails at odd multiples of nailDist/2
     y0 = Math.ceil(y0 / nailDist / 2) * nailDist * 2
     const x0 = nailDist / 2
