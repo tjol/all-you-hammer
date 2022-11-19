@@ -8,11 +8,23 @@ audio:
 sprites:
 	$(MAKE) -C sprites
 
-dist: audio sprites
+npm-install:
+	$(NPM) install
+
+deps: audio sprites npm-install
+
+dist: deps
 	$(NPM) run build
+
+dev: deps
+	$(NPM) run dev
+
+preview: deps
+	$(NPM) run preview
 
 clean:
 	$(MAKE) -C audio clean
+	$(MAKE) -C sprites clean
 	rm -rf dist
 
-.PHONY: audio sprites dist
+.PHONY: audio sprites npm-install deps dist dev preview

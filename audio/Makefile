@@ -16,7 +16,7 @@ all: $(MP3_TARGETS) $(OGG_TARGETS)
 
 
 clean:
-	rm -f $(MP3_TARGETS) $(OGG_TARGETS) screw.wav
+	rm -f $(MP3_TARGETS) $(OGG_TARGETS)
 
 
 .PHONY: all clean

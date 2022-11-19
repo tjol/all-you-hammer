@@ -24,6 +24,6 @@ nail-and-screw-pngs:
 
 clean:
 	$(MAKE) -C nails-and-screws clean
-	rm -f nail-screw-sheet.png
+	rm -f nails.png screws.png drop-hammer.png nail-head.png
 
 .PHONY: all clean nail-and-screw-pngs
