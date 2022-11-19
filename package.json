@@ -2,7 +2,7 @@
   "name": "all-you-hammer",
   "private": true,
   "license": "MIT",
-  "version": "0.1.0-alpha1",
+  "version": "0.1.0-alpha2",
   "type": "module",
   "scripts": {
     "dev": "vite",

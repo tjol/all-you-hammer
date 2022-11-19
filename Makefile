@@ -20,7 +20,8 @@ all-you-hammer-banner.png: logo2x.png
 	$(MAGICK) $< -crop 1200x+100+0 -bordercolor '#401010' -border 0x50 $@
 
 
-deps: audio sprites logo2x.png npm-install
+deps: audio images npm-install
+images: sprites logo2x.png
 
 dist: deps
 	$(NPM) run build
@@ -35,6 +36,7 @@ clean:
 	$(MAKE) -C audio clean
 	$(MAKE) -C sprites clean
 	rm -rf dist
-	rm -f logo2x.png all-you-hammer-banner.png
+	rm -f all-you-hammer-banner.png
 
-.PHONY: audio sprites npm-install deps dist dev preview
+.PHONY: audio sprites images npm-install deps dist dev preview
+.NOTPARALLEL: images
