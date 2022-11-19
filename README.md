@@ -10,7 +10,7 @@ not actually nails, and won't be so easy to deal with (they're screws. Screws is
 what the things that aren't nails are).
 
 **All you have is a hammer** was created for [Game Off 2022](https://itch.io/jam/game-off-2022),
-a game jam with the theme **“Cli-ché”**.
+a game jam with the theme **“cliché”**.
 
 <p align="center">
 <img src="screenshot.png">
