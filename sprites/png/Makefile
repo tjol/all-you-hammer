@@ -1,9 +1,11 @@
 MONTAGE?=montage
+CONVERT?=convert
 INKSCAPE?=inkscape
 
 SVG_DIR=../svg
 
-all: nails.png screws.png drop-hammer.png nail-head.png restart-btn.png tilt-btn.png
+all: nails.png screws.png drop-hammer.png nail-head.png \
+	restart-btn.png tilt-btn.png start-btn.png logo.png logo2x.png
 
 nails.png: nail-and-screw-pngs nails-and-screws/nails.lst
 	$(MONTAGE) -tile x1 -geometry +0+0 -background none \
@@ -21,6 +23,16 @@ nail-head.png: $(SVG_DIR)/nail-head.svg
 
 %-btn.png: $(SVG_DIR)/%-btn.svg
 	$(INKSCAPE) -w 300 --export-filename $@ "$<"
+
+logo.png: $(SVG_DIR)/logo.svg
+	$(INKSCAPE) -w 700 --export-filename $@ "$<"
+
+logo2x.png: $(SVG_DIR)/logo.svg
+	$(INKSCAPE) -w 1400 --export-filename logo2x.wide.png "$<"
+	$(CONVERT) logo2x.wide.png -crop 1037x+179+0 $@
+
+all-you-hammer-banner.png: logo2x.png
+	$(CONVERT) $< -crop 1200x+100+0 -bordercolor '#401010' -border 0x50 $@
 
 nails-and-screws/nails.lst: nails-and-screws/Makefile
 	$(MAKE) -C nails-and-screws nails.lst

@@ -1,8 +1,11 @@
+import logoImg from './sprites/png/logo2x.png'
+
 import nailSprites from './sprites/png/nails.png'
 import screwSprites from './sprites/png/screws.png'
 import nailHeadImg from './sprites/png/nail-head.png'
 import dropHammerImg from './sprites/png/drop-hammer.png'
 import dropHammerShape from './sprites/drop-hammer.shape.json'
+import startBtnImg from './sprites/png/start-btn.png'
 import restartBtnImg from './sprites/png/restart-btn.png'
 import tiltBtnImg from './sprites/png/tilt-btn.png'
 
@@ -69,6 +72,8 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
   }
 
   create () {
+    this.cameras.main.setBackgroundColor('#eeccaa')
+
     this._hud = this.add.text(...hudPos, '', {
       font: 'bold 32px Courier',
       fill: '#c90'
@@ -315,9 +320,36 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
   }
 }
 
+class Splash extends Phaser.Scene {
+  preload () {
+    this.load.image('logo', logoImg)
+    this.load.image('start-btn', startBtnImg)
+  }
+
+  create () {
+    this.add.rectangle(512, 512, 896, 896, 0x401010)
+    const logoImg = this.add.image(512, 512, 'logo')
+    logoImg.scale = 0.5
+    const startBtnImg = this.add.image(512, 768, 'start-btn')
+    startBtnImg.scale = 0.5
+    startBtnImg.setInteractive()
+    startBtnImg.on('clicked', this._startGame, this)
+    this.input.on('gameobjectup', (_pointer, gameObject) => {
+      gameObject.emit('clicked', gameObject)
+    })
+  }
+
+  update () {
+  }
+
+  _startGame () {
+    this.scene.add('game', AllYouHaveIsAHammer, true)
+  }
+}
+
 const config = {
   type: Phaser.AUTO,
-  scene: [AllYouHaveIsAHammer],
+  scene: [Splash],
   backgroundColor: '#eeccaa',
   physics: {
     default: 'matter'

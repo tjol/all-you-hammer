@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="If all you have is a hammer, everything looks like a nail" src="logo.png">
+<img alt="If all you have is a hammer, everything looks like a nail" src="sprites/png/logo.png">
 </p>
 
 **All you have is a hammer** is a tiny browser game in which it is your job to
