@@ -15,7 +15,7 @@ import nail3SoundOgg from './audio/nail3.ogg'
 import screwSoundMp3 from './audio/screw.mp3'
 import screwSoundOgg from './audio/screw.ogg'
 
-import './style.css'
+import './bare.css'
 
 import Phaser from 'phaser'
 import seedrandom from 'seedrandom'
@@ -316,21 +316,19 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
 }
 
 const config = {
-  parent: 'app',
   type: Phaser.AUTO,
-  width: 1024,
-  height: 768,
   scene: [AllYouHaveIsAHammer],
   backgroundColor: '#eeccaa',
   physics: {
     default: 'matter'
+  },
+  scale: {
+    parent: 'app',
+    mode: Phaser.Scale.FIT,
+    width: 1024,
+    height: 1024
   }
 }
 
 // eslint-disable-next-line
 const game = new Phaser.Game(config)
-
-window.addEventListener('load', () => {
-  console.log(`Loading version ${__GAME_VERSION__}`)
-  document.getElementById('version-nr').innerText = __GAME_VERSION__
-})

@@ -1,7 +1,6 @@
 
 body {
-    margin: 0 auto;
-    width: 1024px;
+    margin: auto;
 
     background-color: #401010;
     color: white;
@@ -14,12 +13,27 @@ body {
 
 h1 {
     padding: 0;
-    margin: 1rem;
+    margin: 1rem 0;
     text-align: center;
 }
 
-#logo {
-    width: 700px;
+@media (max-width: 1024px) {
+    #logo {
+        width: 100%;
+    }
+    h1, p {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+@media (min-width: 1024px) {
+    body {
+        width: 1024px;
+    }
+
+    #logo {
+        width: 700px;
+    }
 }
 
 #instructions {
