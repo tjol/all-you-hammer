@@ -18,11 +18,11 @@ clean:
 png-list:
 	@echo $(NAIL_PNGS)
 
-nail-list:
-	@echo $(sort $(filter nail%,$(NAIL_PNGS)))
+nails.lst:
+	echo $(sort $(filter nail%,$(NAIL_PNGS))) > $@
 
-screw-list:
-	@echo $(sort $(filter screw%,$(NAIL_PNGS)))
+screws.lst:
+	echo $(sort $(filter screw%,$(NAIL_PNGS))) > $@
 
 # Instructions for GNU make
 

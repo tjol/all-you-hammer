@@ -1,17 +1,17 @@
-MONTAGE?=magick montage
-
-NAIL_PNGS=$(patsubst %,nails-and-screws/%,$(shell $(MAKE) -sC nails-and-screws nail-list))
-SCREW_PNGS=$(patsubst %,nails-and-screws/%,$(shell $(MAKE) -sC nails-and-screws screw-list))
+MONTAGE?=montage
+INKSCAPE?=inkscape
 
 SVG_DIR=../svg
 
 all: nails.png screws.png drop-hammer.png nail-head.png restart-btn.png tilt-btn.png
 
-nails.png: nail-and-screw-pngs
-	$(MONTAGE) -tile x1 -geometry +0+0 -background none $(NAIL_PNGS) $@ 
+nails.png: nail-and-screw-pngs nails-and-screws/nails.lst
+	$(MONTAGE) -tile x1 -geometry +0+0 -background none \
+		$(patsubst %,nails-and-screws/%,$(shell cat nails-and-screws/nails.lst)) $@
 
-screws.png: nail-and-screw-pngs
-	$(MONTAGE) -tile x1 -geometry +0+0 -background none $(SCREW_PNGS) $@ 
+screws.png: nail-and-screw-pngs nails-and-screws/screws.lst
+	$(MONTAGE) -tile x1 -geometry +0+0 -background none \
+		$(patsubst %,nails-and-screws/%,$(shell cat nails-and-screws/screws.lst)) $@
 
 drop-hammer.png: $(SVG_DIR)/drop-hammer.svg
 	$(INKSCAPE) -w 650 --export-filename $@ "$<"
@@ -21,6 +21,12 @@ nail-head.png: $(SVG_DIR)/nail-head.svg
 
 %-btn.png: $(SVG_DIR)/%-btn.svg
 	$(INKSCAPE) -w 300 --export-filename $@ "$<"
+
+nails-and-screws/nails.lst: nails-and-screws/Makefile
+	$(MAKE) -C nails-and-screws nails.lst
+
+nails-and-screws/screws.lst: nails-and-screws/Makefile
+	$(MAKE) -C nails-and-screws screws.lst
 
 nail-and-screw-pngs:
 	$(MAKE) -C nails-and-screws

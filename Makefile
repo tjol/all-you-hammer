@@ -1,6 +1,6 @@
 NPM?=pnpm
 INKSCAPE?=inkscape
-MAGICK?=magick
+CONVERT?=convert
 
 all: dist
 
@@ -17,7 +17,7 @@ logo2x.png: logo.svg
 	$(INKSCAPE) -w 1400 --export-filename $@ "$<"
 
 all-you-hammer-banner.png: logo2x.png
-	$(MAGICK) $< -crop 1200x+100+0 -bordercolor '#401010' -border 0x50 $@
+	$(CONVERT) $< -crop 1200x+100+0 -bordercolor '#401010' -border 0x50 $@
 
 
 deps: audio images npm-install
