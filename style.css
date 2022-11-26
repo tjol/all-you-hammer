@@ -36,6 +36,11 @@ h1 {
     }
 }
 
+#app {
+    text-align: center;
+    margin: auto;
+}
+
 #instructions {
     text-align: center;
     font-size: 1.2rem;

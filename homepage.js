@@ -1,7 +1,7 @@
 import './style.css'
 
 window.onload = () => {
-  const width = Math.min(window.innerWidth, 1024)
+  const width = Math.min(window.innerWidth, window.innerHeight, 1024)
   const height = width
   const gameFrame = document.createElement('iframe')
   gameFrame.setAttribute('width', width)
