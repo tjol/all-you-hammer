@@ -92,7 +92,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this.load.audio('screw', [screwSoundOgg, screwSoundMp3])
 
     this._yPos = 0
-    // this._tiltCount = 0
+    this._tiltCount = tiltCount
     this._nails = {}
     this._levelNumber = level.number
     this._seed = level.seed
@@ -216,14 +216,14 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     }
 
     let hudText = `LEVEL ${this._levelNumber} - ${Math.round(this._yPos / nailDist * 10)}`
-    if (tiltCount !== 0) {
-      hudText += ` - ${tiltCount} TILT`
+    if (this._tiltCount !== 0) {
+      hudText += ` - ${this._tiltCount} TILT`
     }
     this._hud.setText(hudText)
   }
 
   _createNextLevelButton (levelNumber) {
-    if (this._nextLevelButton === null && levelNumber === this._levelNumber) {
+    if (this._nextLevelButton === null && levelNumber === this._levelNumber && this._yPos > level1Height) {
       this._nextLevelButton = this.add.image(750, 500 + this._yPos, 'next-level')
       this._nextLevelButton.setScale(0.5)
       this._nextLevelButton.setDepth(100)
@@ -239,6 +239,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       seed: seedForLevel(levelNumber),
       height: level1Height + (levelNumber - 1) * levelHeightIncrement
     }
+    tiltCount = this._tiltCount
     this._restart()
   }
 
@@ -393,7 +394,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
   _tilt () {
     this._dropHammer.x += (Math.random() - 0.5) * nailDist
     this._dropHammer.y += (Math.random() - 0.5) * nailDist
-    tiltCount += 1
+    this._tiltCount += 1
   }
 
   async _goFullScreen () {
