@@ -173,6 +173,12 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this._fullscreenBtn.setInteractive()
     this._fullscreenBtn.on('clicked', this._goFullScreen, this)
 
+    if (navigator.platform.includes('iPhone')) {
+      // Safari on iPhone does not support the fullscreen API (and I can't be
+      // bothered to program a workaround)
+      this._fullscreenBtn.setVisible(false)
+    }
+
     this._fixedObjects = [
       [this._hud, this._hud.y],
       [this._redAlert, this._redAlert.y],
@@ -193,8 +199,8 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
       this._yPos = Math.min(yPos, this._maxCameraY)
       this.cameras.main.scrollY = this._yPos
       this._collectGarbage()
+      this._createNails()
     }
-    this._createNails()
     if (this._yPos === this._maxCameraY && this._nextLevelButton === null) {
       // Level over
       const levelNumber = this._levelNumber
