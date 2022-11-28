@@ -21,9 +21,15 @@ h1 {
     #logo {
         width: 100%;
     }
+
     h1, p {
         padding-left: 1rem;
         padding-right: 1rem;
+    }
+
+    iframe#gameFrame {
+        width: 100vw;
+        height: 100vw;
     }
 }
 @media (min-width: 1024px) {
@@ -33,6 +39,27 @@ h1 {
 
     #logo {
         width: 700px;
+    }
+
+    iframe#gameFrame {
+        width: 1024px;
+        height: 1024px;
+    }
+}
+
+/* narrow screen, wider than tall */
+@media (max-width: 1024px) and (max-height: 100vw) {
+    iframe#gameFrame {
+        width: 100vh;
+        height: 100vh;
+    }
+}
+
+/* wide screen, wider than tall */
+@media (min-width: 1024px) and (max-height: 1024px) {
+    iframe#gameFrame {
+        width: 100vh;
+        height: 100vh;
     }
 }
 

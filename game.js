@@ -9,6 +9,7 @@ import startBtnImg from './sprites/png/start-btn.png'
 import restartBtnImg from './sprites/png/restart-btn.png'
 import tiltBtnImg from './sprites/png/tilt-btn.png'
 import nextLevelImg from './sprites/png/next-level.png'
+import fullScreenImg from './sprites/png/fullscreen.png'
 
 import nail1SoundMp3 from './audio/nail1.mp3'
 import nail1SoundOgg from './audio/nail1.ogg'
@@ -19,7 +20,7 @@ import nail3SoundOgg from './audio/nail3.ogg'
 import screwSoundMp3 from './audio/screw.mp3'
 import screwSoundOgg from './audio/screw.ogg'
 
-import './bare.css'
+import './game.css'
 
 import Phaser from 'phaser'
 import seedrandom from 'seedrandom'
@@ -83,6 +84,7 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this.load.image('restart-btn', restartBtnImg)
     this.load.image('tilt-btn', tiltBtnImg)
     this.load.image('next-level', nextLevelImg)
+    this.load.image('fullscreen', fullScreenImg)
 
     this.load.audio('nail1', [nail1SoundOgg, nail1SoundMp3])
     this.load.audio('nail2', [nail2SoundOgg, nail2SoundMp3])
@@ -165,24 +167,34 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this._tiltBtn.setInteractive()
     this._tiltBtn.on('clicked', this._tilt, this)
 
+    this._fullscreenBtn = this.add.image(this._width - 34, 34, 'fullscreen')
+    this._fullscreenBtn.scale = 0.5
+    this._fullscreenBtn.setDepth(100)
+    this._fullscreenBtn.setInteractive()
+    this._fullscreenBtn.on('clicked', this._goFullScreen, this)
+
     this._fixedObjects = [
       [this._hud, this._hud.y],
       [this._redAlert, this._redAlert.y],
-      [this._restartBtn, this._restartBtn.y],
-      [this._tiltBtn, this._tiltBtn.y]
+      [this._fullscreenBtn, this._fullscreenBtn.y],
+      [this._restartBtn, this._restartBtn.y - this._height],
+      [this._tiltBtn, this._tiltBtn.y - this._height]
     ]
 
     this._nextLevelButton = null
   }
 
   update () {
+    this._width = this.sys.game.canvas.width
+    this._height = this.sys.game.canvas.height
+
     const yPos = this._dropHammer.y - hammerTargetPos
     if (yPos > this._yPos) {
       this._yPos = Math.min(yPos, this._maxCameraY)
       this.cameras.main.scrollY = this._yPos
       this._collectGarbage()
-      this._createNails()
     }
+    this._createNails()
     if (this._yPos === this._maxCameraY && this._nextLevelButton === null) {
       // Level over
       const levelNumber = this._levelNumber
@@ -190,7 +202,11 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     }
 
     for (const [obj, fixedY] of this._fixedObjects) {
-      obj.y = this._yPos + fixedY
+      if (fixedY >= 0) {
+        obj.y = this._yPos + fixedY
+      } else {
+        obj.y = this._yPos + this._height + fixedY
+      }
     }
 
     let hudText = `LEVEL ${this._levelNumber} - ${Math.round(this._yPos / nailDist * 10)}`
@@ -373,6 +389,16 @@ class AllYouHaveIsAHammer extends Phaser.Scene {
     this._dropHammer.y += (Math.random() - 0.5) * nailDist
     tiltCount += 1
   }
+
+  async _goFullScreen () {
+    if (this._isFullScreen) {
+      await document.exitFullscreen()
+      this._isFullScreen = false
+    } else {
+      await document.documentElement.requestFullscreen()
+      this._isFullScreen = true
+    }
+  }
 }
 
 class Splash extends Phaser.Scene {
@@ -411,11 +437,22 @@ const config = {
   },
   scale: {
     parent: 'app',
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.NONE,
     width: 1024,
-    height: 1024
+    height: 1024,
+    zoom: 1.0
   }
 }
 
-// eslint-disable-next-line
 const game = new Phaser.Game(config)
+
+function resizeGame () {
+  const width = Math.min(window.innerHeight, window.innerWidth)
+  const height = Math.max(width, window.innerHeight)
+  const zoom = width / 1024
+  game.scale.resize(1024, height / zoom)
+  game.scale.setZoom(zoom)
+}
+
+window.addEventListener('resize', resizeGame)
+resizeGame()

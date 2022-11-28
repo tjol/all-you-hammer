@@ -1,11 +1,8 @@
 import './style.css'
 
 window.onload = () => {
-  const width = Math.min(window.innerWidth, window.innerHeight, 1024)
-  const height = width
   const gameFrame = document.createElement('iframe')
-  gameFrame.setAttribute('width', width)
-  gameFrame.setAttribute('height', height)
+  gameFrame.id = 'gameFrame'
   gameFrame.setAttribute('frameborder', '0')
   gameFrame.setAttribute('scrolling', 'no')
   gameFrame.setAttribute('src', 'game.html')

@@ -1,0 +1,13 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    background-color: #401010;
+}
+
+body {
+    margin: auto;
+    max-width: 100vh;
+}

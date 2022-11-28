@@ -6,7 +6,7 @@ SVG_DIR=../svg
 
 all: nails.png screws.png drop-hammer.png nail-head.png \
 	restart-btn.png tilt-btn.png start-btn.png next-level.png \
-	logo.png logo2x.png
+	fullscreen.png logo.png logo2x.png
 
 nails.png: nail-and-screw-pngs nails-and-screws/nails.lst
 	$(MONTAGE) -tile x1 -geometry +0+0 -background none \
@@ -27,6 +27,9 @@ nail-head.png: $(SVG_DIR)/nail-head.svg
 
 next-level.png: $(SVG_DIR)/next-level.svg
 	$(INKSCAPE) -w 800 --export-filename $@ "$<"
+
+fullscreen.png: $(SVG_DIR)/fullscreen.svg
+	$(INKSCAPE) -w 96 --export-filename $@ "$<"
 
 logo.png: $(SVG_DIR)/logo.svg
 	$(INKSCAPE) -w 700 --export-filename $@ "$<"
