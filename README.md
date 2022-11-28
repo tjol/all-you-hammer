@@ -12,9 +12,12 @@ what the things that aren't nails are).
 **All you have is a hammer** was created for [Game Off 2022](https://itch.io/jam/game-off-2022),
 a game jam with the theme **“cliché”**.
 
+## Play the game
+
+ * [On its homepage](https://tjol.eu/hammer-game/)
+ * [On itch.io](https://tjol.itch.io/all-you-have-is-a-hammer)
+
 <p align="center">
 <img src="screenshot.png">
 </p>
-
-## Play it [here](https://tjol.eu/hammer-game/)!
 
